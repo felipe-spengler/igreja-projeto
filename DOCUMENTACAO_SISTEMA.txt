@@ -1,0 +1,37 @@
+SISTEMA DE MAPEAMENTO DE IMPACTO SOCIAL (Multi-Igrejas) - Toledo/PR
+
+--- DESCRIÇÃO GERAL ---
+O sistema foi desenvolvido para permitir que a rede de igrejas de Toledo possa visualizar, em tempo real, onde as ações sociais e solidárias estão ocorrendo, qual o impacto gerado (quantas vidas foram alcançadas) e qual o planejamento de atividades futuras.
+
+--- FUNCIONALIDADES CHAVE ---
+1. MAPA INTERATIVO (PÁGINA PÚBLICA)
+   - Visualização geográfica de todos os bairros de Toledo.
+   - Bairros são coloridos conforme o volume de ações realizadas (Visão de Impacto).
+   - Ao clicar em um bairro, é possível ver a lista de ações que ocorreram ali.
+   - Filtros por Igreja e por Ministério/Clube (Ex: Ver apenas as ações do Clube de Desbravadores ou apenas da Igreja X).
+
+2. DASHBOARD DE IMPACTO
+   - Contadores globais de vidas alcançadas (pessoas atendidas).
+   - Volume de ações realizadas versus ações programadas.
+   - Gráfico de barras mostrando qual ministério está alcançando mais pessoas.
+
+3. CALENDÁRIO DE AÇÕES
+   - Lista cronológica de ações planejadas para os próximos dias/meses.
+   - Histórico de ações já concluídas.
+
+4. PAINEL ADMINISTRATIVO (MULTI-TENANT)
+   - Cada Igreja tem seu próprio login e pode gerenciar apenas seus dados (seus clubes, suas ações).
+   - SUPER ADMIN: Capacidade de visualizar todas as cidades/igrejas e de "entrar" em qualquer perfil para auxílio técnico ou supervisão.
+
+5. GESTÃO DE AÇÕES
+   - Cadastro de ações com: Título, Descrição, Localização no Mapa (lat/lng), Bairro, Data e Fotos da Ação.
+   - Registro de métricas pós-evento (quantas pessoas foram ajudadas).
+
+--- TECNOLOGIA ---
+- Backend: Laravel v12 (Motor de regras e banco de dados).
+- Frontend: React + Leaflet Maps (Interface moderna e rápida).
+- GeoDados: Integração com GeoJSON oficial da prefeitura de Toledo.
+
+--- PERSISTÊNCIA E HOSPEDAGEM ---
+- O banco de dados MySQL é persistente via volumes Docker.
+- Pode ser facilmente escalado para mais cidades além de Toledo.
