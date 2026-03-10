@@ -11,7 +11,7 @@ O sistema foi desenvolvido para permitir que a rede de igrejas de Toledo possa v
    - Filtros por Igreja e por Ministério/Clube (Ex: Ver apenas as ações do Clube de Desbravadores ou apenas da Igreja X).
 
 2. DASHBOARD DE IMPACTO
-   - Contadores globais de vidas alcançadas (pessoas atendidas).
+   - Contadores globais de pessoas impactadas.
    - Volume de ações realizadas versus ações programadas.
    - Gráfico de barras mostrando qual ministério está alcançando mais pessoas.
 
@@ -23,9 +23,11 @@ O sistema foi desenvolvido para permitir que a rede de igrejas de Toledo possa v
    - Cada Igreja tem seu próprio login e pode gerenciar apenas seus dados (seus clubes, suas ações).
    - SUPER ADMIN: Capacidade de visualizar todas as cidades/igrejas e de "entrar" em qualquer perfil para auxílio técnico ou supervisão.
 
-5. GESTÃO DE AÇÕES
-   - Cadastro de ações com: Título, Descrição, Localização no Mapa (lat/lng), Bairro, Data e Fotos da Ação.
-   - Registro de métricas pós-evento (quantas pessoas foram ajudadas).
+5. GESTÃO E MODERAÇÃO (MODERATED REGISTRATION)
+   - Cadastro Público de Ações: Qualquer cidadão ou colaborador pode sugerir a realização de uma ação ou registrar uma já feita.
+   - Moderação por Igreja: Propostas recebidas ficam "pendentes" no painel da igreja relevante até que um administrador a valide e vincule oficialmente.
+   - Novas Igrejas: Portal para que novas congregações solicitem entrada na rede, aguardando aprovação do Super Administrador.
+   - Multi-Admin: Suporte para múltiplos usuários gerenciarem a mesma igreja.
 
 --- TECNOLOGIA ---
 - Backend: Laravel v12 (Motor de regras e banco de dados).

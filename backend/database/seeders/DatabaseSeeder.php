@@ -46,7 +46,7 @@ class DatabaseSeeder extends Seeder
 
         $igrejasNoBanco = [];
         foreach ($igrejas as $index => $igrejaData) {
-            $igreja = \App\Models\Igreja::create($igrejaData);
+            $igreja = \App\Models\Igreja::create(array_merge($igrejaData, ['status' => 'ativo']));
             $igrejasNoBanco[] = $igreja;
 
             // Criar um admin para cada igreja
@@ -135,9 +135,11 @@ class DatabaseSeeder extends Seeder
                     'descricao' => $tpl['desc'],
                     'clube_id' => $clube->id,
                     'bairro_id' => $idsBairros[array_rand($idsBairros)],
+                    'igreja_id' => $clube->igreja_id,
                     'data_inicio' => $data,
                     'data_fim' => $data->addHours(4),
                     'status' => $status,
+                    'status_moderacao' => 'aprovada',
                     'pessoas_atendidas' => $pessoas,
                     'lat' => $igrejasNoBanco[0]->lat + (rand(-50, 50) / 1000), // Random jitter around center
                     'lng' => $igrejasNoBanco[0]->lng + (rand(-50, 50) / 1000),
