@@ -137,13 +137,13 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                             data={b.geojson}
                             pathOptions={{
                                 fillColor: getDistrictColor(b.nome),
-                                fillOpacity: count > 0 ? 0.75 : 0.1,
-                                color: '#ffffff',
-                                weight: 1.5,
-                                opacity: 0.8
+                                fillOpacity: count > 0 ? 0.75 : 0.05,
+                                color: '#334155', // Slate-700 para bordas visíveis mas elegantes
+                                weight: 1,      // Bordas finas
+                                opacity: 0.3    // Opacidade baixa para ser sutil
                             }}
                         >
-                            <Popup className="custom-popup !rounded-[2.5rem] !p-0">
+                            <Popup className="custom-popup !rounded-[2.5rem] !p-0 shadow-2xl">
                                 <div className="bg-slate-900 text-white p-6 rounded-t-[2.5rem]">
                                     <h4 className="font-black text-xl tracking-tighter mb-1">{b.nome}</h4>
                                     <div className="flex items-center gap-2">
@@ -151,10 +151,17 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                                         <p className="text-[10px] text-indigo-300 uppercase font-black tracking-[0.1em]">{count} IMPACTOS</p>
                                     </div>
                                 </div>
-                                <div className="p-5 max-h-[250px] overflow-y-auto space-y-4 bg-white rounded-b-[2.5rem]">
+                                <div className="p-5 max-h-[350px] overflow-y-auto space-y-6 bg-white rounded-b-[2.5rem]">
                                     {count > 0 ? (
                                         items.map(a => (
                                             <div key={a.id} className="pb-4 border-b border-slate-50 last:border-0 last:pb-0">
+                                                {a.fotos && a.fotos.length > 0 && (
+                                                    <img
+                                                        src={a.fotos[0]}
+                                                        className="w-full h-32 object-cover rounded-2xl mb-3 shadow-sm border border-slate-100"
+                                                        alt={a.titulo}
+                                                    />
+                                                )}
                                                 <p className="text-[10px] font-black text-slate-800 uppercase mb-2 leading-tight">{a.titulo}</p>
                                                 <div className="flex justify-between items-center">
                                                     <span className="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg font-bold">{a.pessoas_atendidas} atendidas</span>
