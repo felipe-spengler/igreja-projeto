@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Popup } from 'react-leaflet';
 import { format, parseISO } from 'date-fns';
-import { List, X, Info, Users, Activity, ChevronRight, ChevronLeft, Filter, Settings2 } from 'lucide-react';
+import { List, X, Info, Users, Activity, Filter, Layers } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgreja, filterClube, setFilterClube, igrejas }) => {
     const [showList, setShowList] = useState(false);
     const [viewMode, setViewMode] = useState('actions'); // 'actions' ou 'impact'
     const [autoTimer, setAutoTimer] = useState(true);
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // Mobile menu toggle
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // Lógica de Autocycle (Troca a cada 15s)
     useEffect(() => {
         if (!autoTimer) return;
         const interval = setInterval(() => {
@@ -19,7 +18,6 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
         return () => clearInterval(interval);
     }, [autoTimer]);
 
-    // Cálculo das métricas por bairro
     const statsPorBairro = {};
     filteredAcoes.forEach(a => {
         const b = a.bairro?.nome;
@@ -34,14 +32,11 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
     const getDistrictColor = (bairroNome) => {
         const stats = statsPorBairro[bairroNome];
         if (!stats) return 'rgba(241, 245, 249, 0.5)';
-
         const value = viewMode === 'actions' ? stats.actions : stats.impact;
         if (value === 0) return 'rgba(241, 245, 249, 0.5)';
-
         const allValues = Object.values(statsPorBairro).map(s => viewMode === 'actions' ? s.actions : s.impact);
         const max = Math.max(...allValues, 1);
         const ratio = value / max;
-
         if (ratio < 0.25) return '#fde047';
         if (ratio < 0.5) return '#fb923c';
         if (ratio < 0.75) return '#ef4444';
@@ -51,146 +46,113 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
     return (
         <div className="h-full w-full relative z-0 animate-fade-in flex flex-col uppercase tracking-tighter overflow-hidden">
 
-            {/* BOTÃO MOBILE PARA ABRIR MENU (FICA NO TOPO ESQUERDO) */}
+            {/* BOTÃO MOBILE */}
             {!isMenuOpen && (
                 <button
                     onClick={() => setIsMenuOpen(true)}
-                    className="md:hidden absolute top-6 left-6 z-[1002] bg-slate-900 text-white p-4 rounded-3xl shadow-2xl border border-white/10 active:scale-90 transition-all"
+                    className="md:hidden absolute top-4 left-4 z-[1002] bg-slate-900 text-white p-3.5 rounded-2xl shadow-2xl border border-white/10 active:scale-90 transition-all"
                 >
-                    <Filter size={24} />
+                    <Filter size={20} />
                 </button>
             )}
 
-            {/* PAINEL DE CONTROLE (FILTROS + MODOS) */}
+            {/* PAINEL DE CONTROLE (COMPACTO NO DESKTOP, SCROLL NO MOBILE) */}
             <div className={`
-                absolute md:top-6 md:left-6 z-[1001] transition-all duration-500 ease-out
-                ${isMenuOpen ? 'inset-0 bg-slate-950/40 backdrop-blur-md pointer-events-auto' : 'pointer-events-none -translate-x-full md:translate-x-0'}
+                absolute z-[1001] transition-all duration-500 ease-out
+                ${isMenuOpen ? 'inset-0 bg-slate-950/60 backdrop-blur-sm pointer-events-auto' : 'pointer-events-none md:top-6 md:left-6'}
             `}>
                 <div className={`
-                    bg-slate-900/95 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-white/10 pointer-events-auto flex flex-col gap-6
-                    w-full max-w-sm h-full md:h-auto md:w-80 md:rounded-[2.5rem] relative
-                    transition-all duration-500
+                    bg-slate-900/95 backdrop-blur-xl shadow-2xl border border-white/10 pointer-events-auto flex flex-col
+                    w-full max-w-[320px] md:w-[280px] md:max-h-[calc(100vh-80px)] md:rounded-[2rem] h-full md:h-auto relative
+                    transition-all duration-500 overflow-y-auto custom-scrollbar
                     ${isMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                 `}>
 
-                    {/* BOTÃO FECHAR MOBILE */}
-                    <button
-                        onClick={() => setIsMenuOpen(false)}
-                        className="md:hidden absolute top-8 right-8 text-slate-400 hover:text-white transition-colors"
-                    >
-                        <X size={28} />
-                    </button>
-
-                    <div className="mb-4">
-                        <h2 className="text-2xl font-black text-white italic tracking-tighter">CONFIGURAÇÕES</h2>
-                        <p className="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Personalize seu mapa</p>
-                    </div>
-
-                    {/* INDICADOR DE MODO ATUAL */}
-                    <div className="flex bg-white/5 p-1 rounded-2xl relative border border-white/5">
-                        <div
-                            className={`absolute inset-y-1 w-1/2 bg-indigo-600 rounded-xl transition-all duration-500 ease-in-out ${viewMode === 'impact' ? 'left-[48.5%]' : 'left-1'}`}
-                        ></div>
-                        <button
-                            onClick={() => { setViewMode('actions'); setAutoTimer(false); }}
-                            className={`flex-1 py-3 text-[10px] font-black z-10 transition-colors flex items-center justify-center gap-2 ${viewMode === 'actions' ? 'text-white' : 'text-slate-400'}`}
-                        >
-                            <Activity size={12} /> POR AÇÕES
-                        </button>
-                        <button
-                            onClick={() => { setViewMode('impact'); setAutoTimer(false); }}
-                            className={`flex-1 py-3 text-[10px] font-black z-10 transition-colors flex items-center justify-center gap-2 ${viewMode === 'impact' ? 'text-white' : 'text-slate-400'}`}
-                        >
-                            <Users size={12} /> POR IMPACTO
-                        </button>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] pl-1">Filtrar por Rede</span>
-                        <select
-                            value={filterIgreja}
-                            onChange={(e) => setFilterIgreja(e.target.value)}
-                            className="bg-white/5 border-white/5 border text-xs font-bold text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none px-4 py-4 appearance-none cursor-pointer hover:bg-white/10 transition-all w-full"
-                        >
-                            <option value="todas" className="bg-slate-900">Todas as Igrejas</option>
-                            {igrejas.map(i => <option key={i.id} value={i.id} className="bg-slate-900">{i.nome}</option>)}
-                        </select>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                        <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] pl-1">Filtrar por Clube</span>
-                        <select
-                            value={filterClube}
-                            onChange={(e) => setFilterClube(e.target.value)}
-                            className="bg-white/5 border-white/5 border text-xs font-bold text-white rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none px-4 py-4 appearance-none cursor-pointer hover:bg-white/10 transition-all w-full"
-                        >
-                            <option value="todos" className="bg-slate-900">Todos os Clubes</option>
-                            {Array.from(new Set(acoes.map(a => a.clube?.nome))).filter(Boolean).map(name => (
-                                <option key={name} value={name} className="bg-slate-900">{name}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <button
-                        onClick={() => { setShowList(true); setIsMenuOpen(false); }}
-                        className="mt-4 bg-white text-slate-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl transition-all active:scale-95 border-b-4 border-slate-300"
-                    >
-                        <List size={16} /> Ver Lista Total de Ações
-                    </button>
-
-                    {autoTimer && (
-                        <div className="mt-2 flex flex-col gap-2">
-                            <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full bg-indigo-400 animate-[progress_15s_linear_infinite]"></div>
+                    {/* CONTEÚDO DO MENU */}
+                    <div className="p-6 md:p-5 flex flex-col gap-4">
+                        <div className="flex justify-between items-center mb-1">
+                            <div>
+                                <h2 className="text-xl font-black text-white italic tracking-tighter">FILTROS</h2>
+                                <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase">Ajuste a visualização</p>
                             </div>
-                            <span className="text-[8px] text-slate-500 font-bold tracking-widest text-center">TROCA AUTOMÁTICA ATIVA</span>
+                            <button onClick={() => setIsMenuOpen(false)} className="md:hidden text-slate-400 p-2"><X size={24} /></button>
                         </div>
-                    )}
 
-                    {/* LEGENDA DENTRO DO MENU NO MOBILE, FORA NO PC */}
-                    <div className="mt-8 bg-white/5 p-6 rounded-3xl border border-white/5">
-                        <div className="flex items-center gap-2 mb-4 px-1">
-                            <Info size={14} className="text-slate-500" />
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                Intensidade de {viewMode === 'actions' ? 'Ações' : 'Impacto'}
-                            </span>
+                        {/* TOGGLE MODOS (MAIS COMPACTO) */}
+                        <div className="flex bg-white/5 p-1 rounded-xl relative border border-white/5">
+                            <div className={`absolute inset-y-1 w-1/2 bg-indigo-600 rounded-lg transition-all duration-300 ${viewMode === 'impact' ? 'left-[48%]' : 'left-1'}`}></div>
+                            <button onClick={() => { setViewMode('actions'); setAutoTimer(false); }} className={`flex-1 py-1.5 text-[9px] font-black z-10 flex items-center justify-center gap-1.5 ${viewMode === 'actions' ? 'text-white' : 'text-slate-500'}`}><Activity size={10} /> AÇÕES</button>
+                            <button onClick={() => { setViewMode('impact'); setAutoTimer(false); }} className={`flex-1 py-1.5 text-[9px] font-black z-10 flex items-center justify-center gap-1.5 ${viewMode === 'impact' ? 'text-white' : 'text-slate-500'}`}><Users size={10} /> IMPACTO</button>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <LegendItem color="#fde047" label="BAIXO" isDark />
-                            <LegendItem color="#fb923c" label="MÉDIO" isDark />
-                            <LegendItem color="#ef4444" label="ALTA" isDark />
-                            <LegendItem color="#a855f7" label="FOCAL" isDark />
+
+                        <div className="space-y-3">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest pl-1">Rede</span>
+                                <select value={filterIgreja} onChange={(e) => setFilterIgreja(e.target.value)} className="bg-white/5 border-white/5 border text-[10px] font-bold text-white rounded-xl focus:ring-1 focus:ring-indigo-500 outline-none px-3 py-2.5 appearance-none cursor-pointer w-full uppercase">
+                                    <option value="todas" className="bg-slate-900">Todas as Igrejas</option>
+                                    {igrejas.map(i => <option key={i.id} value={i.id} className="bg-slate-900">{i.nome}</option>)}
+                                </select>
+                            </div>
+
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest pl-1">Clube</span>
+                                <select value={filterClube} onChange={(e) => setFilterClube(e.target.value)} className="bg-white/5 border-white/5 border text-[10px] font-bold text-white rounded-xl focus:ring-1 focus:ring-indigo-500 outline-none px-3 py-2.5 appearance-none cursor-pointer w-full uppercase">
+                                    <option value="todos" className="bg-slate-900">Todos os Clubes</option>
+                                    {Array.from(new Set(acoes.map(a => a.clube?.nome))).filter(Boolean).map(name => (
+                                        <option key={name} value={name} className="bg-slate-900">{name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <button onClick={() => { setShowList(true); setIsMenuOpen(false); }} className="bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95"><List size={12} /> LISTA DE ATIVIDADES</button>
+
+                        {autoTimer && (
+                            <div className="mt-1">
+                                <div className="h-0.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                    <div className="h-full bg-indigo-400 animate-[progress_15s_linear_infinite]"></div>
+                                </div>
+                                <p className="text-[7px] text-slate-600 font-bold tracking-widest text-center mt-1">AUTO-SWITCH ATIVO</p>
+                            </div>
+                        )}
+
+                        <div className="mt-2 pt-4 border-t border-white/5">
+                            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-1.5"><Layers size={10} /> Escala de Intensidade</p>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                <LegendItem color="#fde047" label="Baixo" isDark />
+                                <LegendItem color="#fb923c" label="Médio" isDark />
+                                <LegendItem color="#ef4444" label="Alta" isDark />
+                                <LegendItem color="#a855f7" label="Focal" isDark />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* DRAWER LATERAL (LISTA) */}
+            {/* LISTA LATERAL (DRAWER) */}
             {showList && (
-                <div className="absolute inset-y-0 right-0 w-full md:w-[450px] z-[2005] animate-fade-in flex">
-                    <div className="flex-1 bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.2)] flex flex-col border-l border-slate-100">
-                        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 backdrop-blur-md sticky top-0 z-10">
+                <div className="absolute inset-y-0 right-0 w-full md:w-[380px] z-[2005] animate-fade-in flex">
+                    <div className="flex-1 bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.15)] flex flex-col border-l border-slate-100">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <div>
-                                <h3 className="text-3xl font-black text-slate-900 tracking-tighter italic">LISTAGEM GERAL</h3>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">{filteredAcoes.length} Registros encontrados em Toledo</p>
+                                <h3 className="text-xl font-black text-slate-900 italic">ATIVIDADES</h3>
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{filteredAcoes.length} Registros</p>
                             </div>
-                            <button onClick={() => setShowList(false)} className="p-4 bg-white rounded-[1.5rem] text-slate-400 hover:text-red-500 shadow-sm transition-all border border-slate-100 active:scale-90">
-                                <X size={24} />
-                            </button>
+                            <button onClick={() => setShowList(false)} className="p-2 text-slate-400 hover:text-red-500 transition-all"><X size={20} /></button>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-8 space-y-8">
+                        <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
                             {filteredAcoes.map(a => (
-                                <div key={a.id} className="group cursor-pointer">
-                                    <div className="flex gap-6 items-start">
-                                        <div className="w-24 h-24 rounded-[2rem] overflow-hidden shrink-0 shadow-xl border border-slate-100">
-                                            <img src={a.fotos?.[0] || 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=200&auto=format&fit=crop'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                <div key={a.id} className="group border-b border-slate-50 pb-5 last:border-0 cursor-pointer">
+                                    <div className="flex gap-4 items-start">
+                                        <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 shadow-md border border-slate-100">
+                                            <img src={a.fotos?.[0] || 'https://via.placeholder.com/100'} className="w-full h-full object-cover group-hover:scale-110 transition-all" />
                                         </div>
                                         <div className="grow">
-                                            <h4 className="font-black text-slate-900 text-sm leading-tight uppercase group-hover:text-indigo-600 transition-colors mb-2 italic tracking-tighter">{a.titulo}</h4>
-                                            <span className="text-[9px] text-slate-400 font-black tracking-widest border border-slate-100 px-3 py-1 rounded-full mb-3 inline-block">{a.bairro?.nome || 'TOLEDO'}</span>
-                                            <div className="flex items-center gap-4">
-                                                <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100">{Number(a.pessoas_atendidas || 0)} ATENDIDAS</span>
-                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1 italic"><Activity size={10} /> {a.data_inicio ? format(parseISO(a.data_inicio), 'dd/MM/yy') : ''}</span>
+                                            <h4 className="font-black text-slate-900 text-[11px] leading-tight uppercase group-hover:text-indigo-600 mb-1">{a.titulo}</h4>
+                                            <span className="text-[8px] text-slate-400 font-bold uppercase tracking-widest block mb-2">{a.bairro?.nome || 'TOLEDO'}</span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100 truncate">{Number(a.pessoas_atendidas || 0)} ATENDIDAS</span>
+                                                <span className="text-[8px] font-black text-slate-400 uppercase">{a.data_inicio ? format(parseISO(a.data_inicio), 'dd/MM/yy') : ''}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -214,42 +176,28 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                             pathOptions={{
                                 fillColor: getDistrictColor(b.nome),
                                 fillOpacity: (viewMode === 'actions' ? stats.actions : stats.impact) > 0 ? 0.75 : 0.05,
-                                color: '#334155', weight: 1.5, opacity: 0.2
+                                color: '#334155', weight: 1, opacity: 0.15
                             }}
                         >
-                            <Popup className="custom-popup !rounded-[2.5rem] !p-0 shadow-2xl" offset={[150, 0]}>
-                                <div className="bg-slate-900 text-white p-8 rounded-t-[2.5rem]">
-                                    <h4 className="font-black text-2xl tracking-tighter mb-2 italic uppercase">{b.nome}</h4>
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-3 h-3 rounded-full animate-pulse ${stats.actions > 0 ? 'bg-indigo-500' : 'bg-slate-600'}`}></div>
-                                        <p className="text-[11px] text-indigo-300 uppercase font-black tracking-[0.1em]">
-                                            {stats.actions} AÇÕES · {stats.impact} IMPACTADOS
-                                        </p>
-                                    </div>
+                            <Popup className="custom-popup !rounded-[2rem] !p-0 shadow-2xl" offset={[120, 0]}>
+                                <div className="bg-slate-900 text-white p-6 rounded-t-[2rem]">
+                                    <h4 className="font-black text-lg tracking-tighter mb-1 italic uppercase">{b.nome}</h4>
+                                    <p className="text-[9px] text-indigo-300 uppercase font-black tracking-widest">{stats.actions} AÇÕES · {stats.impact} IMPACTADOS</p>
                                 </div>
-                                <div className="p-8 max-h-[400px] overflow-y-auto space-y-8 bg-white rounded-b-[2.5rem]">
+                                <div className="p-6 max-h-[300px] overflow-y-auto space-y-6 bg-white rounded-b-[2rem] custom-scrollbar">
                                     {stats.actions > 0 ? (
                                         items.map(a => (
-                                            <div key={a.id} className="pb-6 border-b border-slate-100 last:border-0 last:pb-0">
-                                                {a.fotos && a.fotos.length > 0 && (
-                                                    <img
-                                                        src={a.fotos[0]}
-                                                        className="w-full h-40 object-cover rounded-[2rem] mb-4 shadow-sm border border-slate-100"
-                                                        alt={a.titulo}
-                                                    />
-                                                )}
-                                                <p className="text-[11px] font-black text-slate-900 uppercase mb-3 leading-tight italic tracking-tighter">{a.titulo}</p>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-[10px] bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-xl font-black border border-emerald-100">{Number(a.pessoas_atendidas || 0)} ATENDIDOS</span>
-                                                    <span className="text-[10px] text-slate-400 font-black italic tracking-widest">{a.data_inicio ? format(parseISO(a.data_inicio), 'dd/MM/yy') : ''}</span>
+                                            <div key={a.id} className="pb-4 border-b border-slate-100 last:border-0">
+                                                {a.fotos && a.fotos.length > 0 && <img src={a.fotos[0]} className="w-full h-32 object-cover rounded-xl mb-3 border border-slate-50" />}
+                                                <p className="text-[10px] font-black text-slate-900 uppercase mb-2 italic leading-tight">{a.titulo}</p>
+                                                <div className="flex justify-between items-center text-[8px] font-black italic">
+                                                    <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-lg uppercase">{Number(a.pessoas_atendidas || 0)} ATENDIDOS</span>
+                                                    <span className="text-slate-400">{a.data_inicio ? format(parseISO(a.data_inicio), 'dd/MM/yy') : ''}</span>
                                                 </div>
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-center py-8">
-                                            <Info size={24} className="mx-auto text-slate-200 mb-2" />
-                                            <p className="text-slate-400 italic text-xs font-black uppercase tracking-widest">Sem registros no momento</p>
-                                        </div>
+                                        <p className="text-center py-4 text-slate-400 italic text-[9px] uppercase font-bold">Nenhum registro</p>
                                     )}
                                 </div>
                             </Popup>
@@ -261,17 +209,19 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @keyframes progress { from { width: 0%; } to { width: 100%; } }
+                .custom-scrollbar::-webkit-scrollbar { width: 3px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
                 .leaflet-popup-content-wrapper { background: transparent !important; box-shadow: none !important; }
-                .leaflet-popup-tip { background: #0f172a !important; }
             ` }} />
         </div>
     );
 };
 
 const LegendItem = ({ color, label, isDark }) => (
-    <div className="flex items-center gap-3">
-        <div className="w-4 h-4 rounded-lg shadow-sm shrink-0" style={{ backgroundColor: color }}></div>
-        <span className={`text-[9px] font-black tracking-widest ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{label}</span>
+    <div className="flex items-center gap-2">
+        <div className="w-2.5 h-2.5 rounded shadow-sm shrink-0" style={{ backgroundColor: color }}></div>
+        <span className={`text-[8px] font-black tracking-widest ${isDark ? 'text-slate-500' : 'text-slate-600'}`}>{label}</span>
     </div>
 );
 

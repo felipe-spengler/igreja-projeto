@@ -1,22 +1,16 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { format, parseISO } from 'date-fns';
-import { SortAsc, SortDesc, Calendar, Users, Activity } from 'lucide-react';
+import { SortDesc, Calendar, Users, Activity, ChevronRight } from 'lucide-react';
 import StatBox from '../components/StatBox';
 
 const StatsPage = ({ filteredAcoes }) => {
-    const [sortBy, setSortBy] = useState('recent'); // 'recent', 'impact', 'alphabetical'
+    const [sortBy, setSortBy] = useState('recent');
 
     const sortedAcoes = [...filteredAcoes].sort((a, b) => {
-        if (sortBy === 'recent') {
-            return new Date(b.data_inicio) - new Date(a.data_inicio);
-        }
-        if (sortBy === 'impact') {
-            return (b.pessoas_atendidas || 0) - (a.pessoas_atendidas || 0);
-        }
-        if (sortBy === 'alphabetical') {
-            return a.titulo.localeCompare(b.titulo);
-        }
+        if (sortBy === 'recent') return new Date(b.data_inicio) - new Date(a.data_inicio);
+        if (sortBy === 'impact') return (Number(b.pessoas_atendidas) || 0) - (Number(a.pessoas_atendidas) || 0);
+        if (sortBy === 'alphabetical') return a.titulo.localeCompare(b.titulo);
         return 0;
     });
 
@@ -24,101 +18,98 @@ const StatsPage = ({ filteredAcoes }) => {
     const fRealizadas = filteredAcoes.filter(a => a.status === 'realizada').length;
     const fProgramadas = filteredAcoes.filter(a => a.status === 'programada').length;
 
-    // Chart logic
     const chartDataMap = {};
     filteredAcoes.forEach(a => {
-        const nome = a.clube?.nome || 'Independentes';
+        const nome = a.clube?.nome || 'OUTROS';
         if (!chartDataMap[nome]) chartDataMap[nome] = { nome, Atendidos: 0 };
         chartDataMap[nome].Atendidos += (Number(a.pessoas_atendidas) || 0);
     });
     const chartData = Object.values(chartDataMap);
 
     return (
-        <div className="p-8 pb-32 w-full max-w-7xl mx-auto animate-fade-in min-h-screen overflow-y-auto">
+        <div className="p-6 pb-32 w-full max-w-7xl mx-auto animate-fade-in min-h-screen overflow-y-auto custom-scrollbar uppercase tracking-tighter">
             <header className="mb-10 flex flex-col xl:flex-row xl:items-end justify-between gap-8">
                 <div>
-                    <h2 className="text-5xl font-black text-slate-800 tracking-tighter uppercase italic">MÉTRICAS</h2>
-                    <p className="text-slate-500 mt-2 font-medium text-lg uppercase tracking-widest text-[12px]">Impacto Social em Toledo</p>
+                    <h2 className="text-4xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">MÉTRICAS</h2>
+                    <p className="text-slate-500 mt-2 font-black text-[9px] uppercase tracking-widest pl-1">Impacto Social em Toledo</p>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-6 items-center">
-                    {/* FILTRO DE ORDENAÇÃO */}
-                    <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-100 shrink-0">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-2">Ordenar:</span>
+                <div className="flex flex-col md:flex-row gap-4 items-center w-full md:w-auto">
+                    <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm p-1.5 pr-4 rounded-2xl shadow-sm border border-slate-100 w-full md:w-auto">
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest pl-3 shrink-0">Ordenar</span>
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value)}
-                            className="bg-slate-50 border-none text-[10px] font-black uppercase text-slate-700 rounded-xl px-4 py-2 outline-none cursor-pointer hover:bg-slate-100 transition-all"
+                            className="bg-slate-50 border-none text-[9px] font-black uppercase text-slate-800 rounded-xl px-4 py-2 outline-none cursor-pointer w-full md:w-auto"
                         >
-                            <option value="recent">MAIS RECENTES</option>
-                            <option value="impact">MAIOR IMPACTO</option>
-                            <option value="alphabetical">A - Z (TÍTULO)</option>
+                            <option value="recent">RECENTES</option>
+                            <option value="impact">IMPACTO</option>
+                            <option value="alphabetical">A - Z</option>
                         </select>
                     </div>
 
-                    <div className="grid grid-cols-2 md:flex md:flex-row gap-4 w-full md:w-auto">
+                    <div className="grid grid-cols-2 md:flex md:flex-row gap-3 w-full md:w-auto">
                         <StatBox count={fAtendidos} label="Atendidas" color="bg-indigo-600" />
                         <StatBox count={fRealizadas} label="Ações" color="bg-emerald-500" />
-                        <div className="col-span-2 md:col-span-1">
+                        <div className="hidden md:block">
                             <StatBox count={fProgramadas} label="Agenda" color="bg-amber-500" />
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 h-[500px] flex flex-col">
-                    <div className="flex justify-between items-center mb-8">
-                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                            <Activity size={16} className="text-indigo-500" /> TOP IMPACTO POR CLUBE
-                        </h3>
-                    </div>
-                    <div className="grow w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* GRAFICO COM ALTURA MINIMA FIXA PARA CELULAR */}
+                <div className="bg-white rounded-[2rem] p-8 shadow-2xl border border-slate-100 min-h-[400px] flex flex-col">
+                    <h3 className="text-[10px] font-black text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-2">
+                        <Activity size={14} className="text-indigo-500" /> IMPACTO POR CLUBE
+                    </h3>
+                    <div className="grow w-full min-h-[300px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="nome" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 8, fontWeight: 'bold' }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} />
+                                <XAxis dataKey="nome" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 7, fontWeight: 900 }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 900 }} />
                                 <Tooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                                <Bar dataKey="Atendidos" fill="#6366f1" radius={[12, 12, 0, 0]} maxBarSize={50} />
+                                <Bar dataKey="Atendidos" fill="#6366f1" radius={[8, 8, 0, 0]} maxBarSize={40} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
-                    <h3 className="text-sm font-black text-slate-800 mb-8 uppercase tracking-widest flex items-center gap-2">
-                        <SortDesc size={16} className="text-indigo-500" /> {sortBy === 'impact' ? 'RANKING DE IMPACTO' : 'CRONOGRAMA DE ATIVIDADES'}
+                <div className="bg-white rounded-[2rem] p-8 shadow-2xl border border-slate-100 flex flex-col">
+                    <h3 className="text-[10px] font-black text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-2">
+                        <SortDesc size={14} className="text-indigo-500" /> ATIVIDADES REGISTRADAS
                     </h3>
-                    <div className="grow overflow-y-auto pr-4 space-y-6">
+                    <div className="space-y-6">
                         {sortedAcoes.map(a => (
-                            <div key={a.id} className="flex gap-6 items-start group">
-                                <div className="w-20 h-20 rounded-[2rem] overflow-hidden shrink-0 shadow-lg group-hover:scale-105 transition-transform border border-slate-100">
+                            <div key={a.id} className="flex gap-5 items-center group border-b border-slate-50 pb-5 last:border-0">
+                                <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden shrink-0 shadow-lg border border-slate-100 group-hover:scale-110 transition-transform">
                                     <img src={a.fotos?.[0] || 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=200&auto=format&fit=crop'} className="w-full h-full object-cover" />
                                 </div>
-                                <div className="grow border-b border-slate-50 pb-6 group-last:border-0">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h4 className="font-black text-slate-800 uppercase text-xs tracking-tight leading-tight group-hover:text-indigo-600 transition-colors uppercase">{a.titulo}</h4>
-                                        <div className="flex items-center gap-1 text-slate-400">
-                                            <Calendar size={10} />
-                                            <span className="text-[9px] font-black uppercase">{format(parseISO(a.data_inicio), 'dd MMM yy')}</span>
-                                        </div>
+                                <div className="grow">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <h4 className="font-black text-slate-900 uppercase text-[10px] italic tracking-tight group-hover:text-indigo-600 transition-colors">{a.titulo}</h4>
+                                        <span className="text-[8px] font-black text-slate-400 uppercase">{format(parseISO(a.data_inicio), 'dd MMM yy')}</span>
                                     </div>
-                                    <p className="text-[11px] text-slate-500 mb-3 font-medium line-clamp-2 uppercase tracking-tight">{a.descricao}</p>
-                                    <div className="flex gap-3">
-                                        <span className="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
-                                            <Users size={10} /> {Number(a.pessoas_atendidas || 0)} IMPACTADOS
-                                        </span>
-                                        <span className="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest truncate max-w-[150px]">
-                                            {a.clube?.nome || 'INDEPENDENTE'}
-                                        </span>
+                                    <div className="flex gap-3 items-center">
+                                        <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-lg text-[8px] font-black border border-emerald-100 shadow-sm">{Number(a.pessoas_atendidas || 0)} ATENDIDAS</span>
+                                        <span className="text-[8px] font-black text-slate-400 uppercase italic truncate max-w-[120px]">{a.clube?.nome || 'INDEPENDENTE'}</span>
                                     </div>
                                 </div>
+                                <ChevronRight className="text-slate-200 group-hover:text-indigo-400 transition-colors" size={16} />
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .custom-scrollbar::-webkit-scrollbar { width: 3px; height: 3px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.05); border-radius: 10px; }
+            `}} />
         </div>
     );
 };
