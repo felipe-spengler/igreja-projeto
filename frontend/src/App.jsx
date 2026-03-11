@@ -92,7 +92,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="relative h-screen w-full bg-slate-50 font-sans overflow-hidden text-slate-800">
-        <main className="h-full w-full relative overflow-hidden bg-white">
+        <main className="h-full w-full relative overflow-y-auto bg-white">
           <Routes>
             <Route path="/" element={<PublicHome
               acoes={acoes} bairros={bairros} filteredAcoes={filteredAcoes}

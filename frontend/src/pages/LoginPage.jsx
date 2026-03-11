@@ -20,8 +20,8 @@ const LoginPage = ({ onLogin }) => {
     };
 
     return (
-        <div className="h-full w-full flex items-center justify-center p-6 bg-slate-50 animate-fade-in">
-            <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl p-10 border border-slate-100">
+        <div className="min-h-full w-full flex flex-col items-center justify-start p-6 pb-32 bg-slate-50 animate-fade-in">
+            <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl p-10 border border-slate-100 my-auto">
                 <div className="text-center mb-10">
                     <div className="bg-indigo-600 w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-200">
                         <LogIn className="text-white w-8 h-8" />

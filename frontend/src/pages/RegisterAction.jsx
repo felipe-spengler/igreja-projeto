@@ -23,8 +23,8 @@ const RegisterAction = ({ bairros, igrejas }) => {
     };
 
     return (
-        <div className="h-full w-full overflow-y-auto p-8 bg-slate-50 animate-fade-in flex items-center justify-center">
-            <div className="w-full max-w-3xl bg-white rounded-[3rem] shadow-2xl p-12 border border-slate-100">
+        <div className="min-h-full w-full p-8 pb-32 bg-slate-50 animate-fade-in flex flex-col items-center justify-start">
+            <div className="w-full max-w-3xl bg-white rounded-[3rem] shadow-2xl p-6 md:p-12 border border-slate-100 my-auto">
                 {!sent ? (
                     <>
                         <div className="mb-10">
