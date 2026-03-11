@@ -115,18 +115,20 @@ function App() {
 
         <style dangerouslySetInnerHTML={{
           __html: `
-                    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-                    .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-                    .leaflet-popup-content-wrapper { border-radius: 2rem !important; overflow: hidden !important; padding: 0 !important; }
-                    .leaflet-popup-content { margin: 0 !important; width: 280px !important; }
+                    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+                    .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+                    .leaflet-popup-content-wrapper { border-radius: 2.5rem !important; overflow: hidden !important; padding: 0 !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4) !important; }
+                    .leaflet-popup-content { margin: 0 !important; width: 320px !important; }
                     .leaflet-popup-tip-container { display: none; }
-                    body { margin: 0; padding: 0; overflow: hidden; height: 100vh; }
-                    *::-webkit-scrollbar { width: 6px; }
+                    body { margin: 0; padding: 0; overflow: hidden; height: 100vh; font-family: 'Outfit', sans-serif; -webkit-font-smoothing: antialiased; }
+                    *::-webkit-scrollbar { width: 4px; display: none; }
+                    @media (min-width: 1024px) { *::-webkit-scrollbar { display: block; } }
                     *::-webkit-scrollbar-track { background: transparent; }
-                    *::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+                    *::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
                     @media (max-width: 1024px) {
-                      .leaflet-popup-content { width: 240px !important; }
+                      .leaflet-popup-content { width: 260px !important; }
                     }
+                    h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
                 `}} />
       </div>
     </BrowserRouter>
