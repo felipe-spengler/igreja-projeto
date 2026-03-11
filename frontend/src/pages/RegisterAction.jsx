@@ -8,7 +8,7 @@ import api from '../api';
 const RegisterAction = ({ bairros, igrejas }) => {
     const [sent, setSent] = useState(false);
     const [formData, setFormData] = useState({
-        titulo: '', descricao: '', bairro_id: '', igreja_id: '', data_inicio: ''
+        titulo: '', descricao: '', bairro_id: '', igreja_id: '', data_inicio: '', pessoas_atendidas: ''
     });
 
     const handleSubmit = async (e) => {
@@ -67,6 +67,12 @@ const RegisterAction = ({ bairros, igrejas }) => {
                                 label="Data Sugerida" type="date"
                                 value={formData.data_inicio} onChange={e => setFormData({ ...formData, data_inicio: e.target.value })}
                             />
+                            <div className="md:col-span-1">
+                                <FormInput
+                                    label="Expectativa de Impacto (Pessoas)" type="number" placeholder="Ex: 50"
+                                    value={formData.pessoas_atendidas} onChange={e => setFormData({ ...formData, pessoas_atendidas: e.target.value })}
+                                />
+                            </div>
                             <div className="md:col-span-2">
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Breve Descrição</label>
                                 <textarea

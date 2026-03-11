@@ -114,7 +114,7 @@ class DatabaseSeeder extends Seeder
             ['titulo' => 'Feira de Saúde', 'desc' => 'Atendimento médico e nutricional gratuito.', 'min_atend' => 100, 'max_atend' => 300],
             ['titulo' => 'Sopão Solidário', 'desc' => 'Distribuição de sopa quente para moradores de rua.', 'min_atend' => 50, 'max_atend' => 150],
             ['titulo' => 'Curso de Culinária Saudável', 'desc' => 'Ensinando receitas vegetarianas para a comunidade.', 'min_atend' => 20, 'max_atend' => 40],
-            ['titulo' => 'Mutirão de Limpeza', 'desc' => 'Limpeza de praças e bueiros para evitar dengue.', 'min_atend' => 0, 'max_atend' => 0],
+            ['titulo' => 'Mutirão de Limpeza', 'desc' => 'Limpeza de praças e bueiros para evitar dengue.', 'min_atend' => 15, 'max_atend' => 45],
             ['titulo' => 'Projeto Quebrando o Silêncio', 'desc' => 'Palestra contra violência doméstica.', 'min_atend' => 80, 'max_atend' => 200],
             ['titulo' => 'Escola Cristã de Férias', 'desc' => 'Atividades bíblicas e recreativas para crianças.', 'min_atend' => 50, 'max_atend' => 120],
         ];

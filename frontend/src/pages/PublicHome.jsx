@@ -1,28 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Popup } from 'react-leaflet';
 import { format, parseISO } from 'date-fns';
-import { List, X, Info } from 'lucide-react';
+import { List, X, Info, Users, Activity, ChevronRight, ChevronLeft } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgreja, filterClube, setFilterClube, igrejas }) => {
     const [showList, setShowList] = useState(false);
+    const [viewMode, setViewMode] = useState('actions'); // 'actions' ou 'impact'
+    const [autoTimer, setAutoTimer] = useState(true);
 
-    const acoesPorBairro = {};
+    // Lógica de Autocycle (Troca a cada 15s)
+    useEffect(() => {
+        if (!autoTimer) return;
+        const interval = setInterval(() => {
+            setViewMode(prev => prev === 'actions' ? 'impact' : 'actions');
+        }, 15000);
+        return () => clearInterval(interval);
+    }, [autoTimer]);
+
+    // Cálculo das métricas por bairro
+    const statsPorBairro = {};
     filteredAcoes.forEach(a => {
         const b = a.bairro?.nome;
-        if (b) acoesPorBairro[b] = (acoesPorBairro[b] || 0) + 1;
+        if (!b) return;
+        if (!statsPorBairro[b]) {
+            statsPorBairro[b] = { actions: 0, impact: 0 };
+        }
+        statsPorBairro[b].actions += 1;
+        // Se pessoas_atendidas vier nulo/indefinido do banco, garantimos que seja 0.
+        // Convertemos para Number para evitar erros de soma de strings.
+        statsPorBairro[b].impact += Number(a.pessoas_atendidas || 0);
     });
 
-    // Cores estilo "previsão do tempo" (térmico)
+    // Cores estilo "previsão do tempo" (térmico) adaptado ao modo de visualização
     const getDistrictColor = (bairroNome) => {
-        const count = acoesPorBairro[bairroNome] || 0;
-        if (count === 0) return 'rgba(241, 245, 249, 0.5)'; // Slate muito claro/transparente
+        const stats = statsPorBairro[bairroNome];
+        if (!stats) return 'rgba(241, 245, 249, 0.5)';
 
-        const counts = Object.values(acoesPorBairro);
-        const max = Math.max(...counts, 1);
-        const ratio = count / max;
+        const value = viewMode === 'actions' ? stats.actions : stats.impact;
+        if (value === 0) return 'rgba(241, 245, 249, 0.5)';
 
-        // Escala: Amarelo -> Laranja -> Vermelho -> Roxo (Intenso)
+        const allValues = Object.values(statsPorBairro).map(s => viewMode === 'actions' ? s.actions : s.impact);
+        const max = Math.max(...allValues, 1);
+        const ratio = value / max;
+
         if (ratio < 0.25) return '#fde047'; // Amarelo
         if (ratio < 0.5) return '#fb923c';  // Laranja
         if (ratio < 0.75) return '#ef4444'; // Vermelho
@@ -30,10 +51,30 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
     };
 
     return (
-        <div className="h-full w-full relative z-0 animate-fade-in flex flex-col">
-            {/* FILTROS NO CANTO SUPERIOR ESQUERDO */}
-            <div className="absolute top-6 left-6 z-[1001] w-72 pointer-events-none">
+        <div className="h-full w-full relative z-0 animate-fade-in flex flex-col uppercase tracking-tighter">
+            {/* FILTROS E TOGGLE DE MODO */}
+            <div className="absolute top-6 left-6 z-[1001] w-80 pointer-events-none">
                 <div className="bg-slate-900/95 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-2xl border border-white/10 pointer-events-auto flex flex-col gap-5">
+
+                    {/* INDICADOR DE MODO ATUAL (PROFISSIONAL) */}
+                    <div className="flex bg-white/5 p-1 rounded-2xl relative">
+                        <div
+                            className={`absolute inset-y-1 w-1/2 bg-indigo-600 rounded-xl transition-all duration-500 ease-in-out ${viewMode === 'impact' ? 'left-[48.5%]' : 'left-1'}`}
+                        ></div>
+                        <button
+                            onClick={() => { setViewMode('actions'); setAutoTimer(false); }}
+                            className={`flex-1 py-2 text-[10px] font-black z-10 transition-colors flex items-center justify-center gap-2 ${viewMode === 'actions' ? 'text-white' : 'text-slate-400'}`}
+                        >
+                            <Activity size={12} /> POR AÇÕES
+                        </button>
+                        <button
+                            onClick={() => { setViewMode('impact'); setAutoTimer(false); }}
+                            className={`flex-1 py-2 text-[10px] font-black z-10 transition-colors flex items-center justify-center gap-2 ${viewMode === 'impact' ? 'text-white' : 'text-slate-400'}`}
+                        >
+                            <Users size={12} /> POR IMPACTO
+                        </button>
+                    </div>
+
                     <div className="flex flex-col gap-1">
                         <span className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] pl-1">Filtrar Rede</span>
                         <select
@@ -66,31 +107,42 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                     >
                         <List size={14} /> Ver Todas as Ações
                     </button>
+
+                    {autoTimer && (
+                        <div className="flex items-center justify-center gap-2">
+                            <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+                                <div className="h-full bg-indigo-400 animate-[progress_15s_linear_infinite]"></div>
+                            </div>
+                            <span className="text-[8px] text-slate-500 font-bold">AUTO-SWITCH</span>
+                        </div>
+                    )}
                 </div>
 
-                {/* LEGENDA PEQUENA ABAIXO DO FILTRO */}
+                {/* LEGENDA DINÂMICA */}
                 <div className="mt-4 bg-white/90 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-slate-200 pointer-events-auto">
                     <div className="flex items-center gap-2 mb-3 px-1">
                         <Info size={12} className="text-slate-400" />
-                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Intensidade de Impacto</span>
+                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
+                            {viewMode === 'actions' ? 'Volume de Ações' : 'Pessoas Impactadas'}
+                        </span>
                     </div>
                     <div className="flex flex-col gap-2">
-                        <LegendItem color="#fde047" label="Baixa" />
-                        <LegendItem color="#fb923c" label="Média" />
-                        <LegendItem color="#ef4444" label="Alta" />
-                        <LegendItem color="#a855f7" label="Foco Total" />
+                        <LegendItem color="#fde047" label="Baixa Densidade" />
+                        <LegendItem color="#fb923c" label="Média Intensidade" />
+                        <LegendItem color="#ef4444" label="Alta Atividade" />
+                        <LegendItem color="#a855f7" label="Impacto Máximo" />
                     </div>
                 </div>
             </div>
 
-            {/* LISTAGEM LATERAL (DRAWER) */}
+            {/* DRAWER LATERAL */}
             {showList && (
                 <div className="absolute inset-y-0 right-0 w-full md:w-[400px] z-[2005] animate-fade-in flex">
                     <div className="flex-1 bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] flex flex-col border-l border-slate-100">
                         <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                             <div>
-                                <h3 className="text-2xl font-black text-slate-800 tracking-tighter">Todas as Ações</h3>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{filteredAcoes.length} Registros Encontrados</p>
+                                <h3 className="text-2xl font-black text-slate-800 tracking-tighter">LISTAGEM GERAL</h3>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{filteredAcoes.length} Registros</p>
                             </div>
                             <button onClick={() => setShowList(false)} className="p-3 bg-white rounded-2xl text-slate-400 hover:text-red-500 shadow-sm transition-all border border-slate-100">
                                 <X size={20} />
@@ -104,12 +156,10 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                                             <img src={a.fotos?.[0] || 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=200&auto=format&fit=crop'} className="w-full h-full object-cover" />
                                         </div>
                                         <div className="grow">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h4 className="font-bold text-slate-800 text-sm leading-tight uppercase group-hover:text-indigo-600 transition-colors">{a.titulo}</h4>
-                                            </div>
+                                            <h4 className="font-bold text-slate-800 text-sm leading-tight uppercase group-hover:text-indigo-600 transition-colors">{a.titulo}</h4>
                                             <p className="text-[10px] text-slate-500 mb-2 font-medium bg-slate-100 px-2 py-1 rounded-lg inline-block">{a.bairro?.nome || 'Toledo'}</p>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">{a.pessoas_atendidas} Pessoas</span>
+                                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">{a.pessoas_atendidas || 0} Pessoas</span>
                                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{a.data_inicio ? format(parseISO(a.data_inicio), 'dd/MM') : ''}</span>
                                             </div>
                                         </div>
@@ -122,37 +172,33 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
             )}
 
             <MapContainer
-                center={[-24.7199, -53.7433]}
-                zoom={13}
-                className="h-full w-full"
-                zoomControl={false}
-                style={{ backgroundColor: '#f8fafc' }}
+                center={[-24.7199, -53.7433]} zoom={13} className="h-full w-full"
+                zoomControl={false} style={{ backgroundColor: '#f8fafc' }}
             >
                 {bairros.map((b) => {
-                    const count = acoesPorBairro[b.nome] || 0;
+                    const stats = statsPorBairro[b.nome] || { actions: 0, impact: 0 };
                     const items = filteredAcoes.filter(a => a.bairro?.nome === b.nome);
                     return b.geojson && (
                         <GeoJSON
-                            key={b.id}
-                            data={b.geojson}
+                            key={b.id} data={b.geojson}
                             pathOptions={{
                                 fillColor: getDistrictColor(b.nome),
-                                fillOpacity: count > 0 ? 0.75 : 0.05,
-                                color: '#334155', // Slate-700 para bordas visíveis mas elegantes
-                                weight: 1,      // Bordas finas
-                                opacity: 0.3    // Opacidade baixa para ser sutil
+                                fillOpacity: (viewMode === 'actions' ? stats.actions : stats.impact) > 0 ? 0.75 : 0.05,
+                                color: '#334155', weight: 1, opacity: 0.3
                             }}
                         >
                             <Popup className="custom-popup !rounded-[2.5rem] !p-0 shadow-2xl">
                                 <div className="bg-slate-900 text-white p-6 rounded-t-[2.5rem]">
-                                    <h4 className="font-black text-xl tracking-tighter mb-1">{b.nome}</h4>
+                                    <h4 className="font-black text-xl tracking-tighter mb-1 uppercase">{b.nome}</h4>
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                                        <p className="text-[10px] text-indigo-300 uppercase font-black tracking-[0.1em]">{count} IMPACTOS</p>
+                                        <p className="text-[10px] text-indigo-300 uppercase font-black tracking-[0.1em]">
+                                            {stats.actions} Ações · {stats.impact} Atendidas
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="p-5 max-h-[350px] overflow-y-auto space-y-6 bg-white rounded-b-[2.5rem]">
-                                    {count > 0 ? (
+                                    {stats.actions > 0 ? (
                                         items.map(a => (
                                             <div key={a.id} className="pb-4 border-b border-slate-50 last:border-0 last:pb-0">
                                                 {a.fotos && a.fotos.length > 0 && (
@@ -164,13 +210,13 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                                                 )}
                                                 <p className="text-[10px] font-black text-slate-800 uppercase mb-2 leading-tight">{a.titulo}</p>
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg font-bold">{a.pessoas_atendidas} atendidas</span>
+                                                    <span className="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-1 rounded-lg font-bold">{Number(a.pessoas_atendidas || 0)} atendidas</span>
                                                     <span className="text-[9px] text-slate-400 font-bold">{a.data_inicio ? format(parseISO(a.data_inicio), 'dd/MM/yy') : ''}</span>
                                                 </div>
                                             </div>
                                         ))
                                     ) : (
-                                        <p className="text-center text-slate-400 italic text-xs py-4">Nenhum impacto registrado ainda.</p>
+                                        <p className="text-center text-slate-400 italic text-xs py-4 uppercase">Nenhum impacto registrado ainda.</p>
                                     )}
                                 </div>
                             </Popup>
@@ -178,6 +224,11 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                     );
                 })}
             </MapContainer>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                @keyframes progress { from { width: 0%; } to { width: 100%; } }
+            ` }} />
         </div>
     );
 };
@@ -185,7 +236,7 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
 const LegendItem = ({ color, label }) => (
     <div className="flex items-center gap-2">
         <div className="w-3 h-3 rounded-md shadow-sm" style={{ backgroundColor: color }}></div>
-        <span className="text-[10px] font-bold text-slate-600 tracking-tight">{label}</span>
+        <span className="text-[10px] font-bold text-slate-600 tracking-tight uppercase">{label}</span>
     </div>
 );
 
