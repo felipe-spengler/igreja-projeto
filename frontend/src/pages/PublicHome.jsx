@@ -63,17 +63,17 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
             `}>
                 <div className={`
                     bg-slate-900/95 backdrop-blur-xl shadow-2xl border border-white/10 pointer-events-auto flex flex-col
-                    w-full max-w-[320px] md:w-[280px] md:max-h-[calc(100vh-80px)] md:rounded-[2rem] h-full md:h-auto relative
+                    w-full max-w-[320px] md:w-[240px] md:max-h-[calc(100vh-80px)] md:rounded-[2rem] h-full md:h-auto relative
                     transition-all duration-500 overflow-y-auto custom-scrollbar
                     ${isMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                 `}>
 
                     {/* CONTEÚDO DO MENU */}
-                    <div className="p-6 md:p-5 flex flex-col gap-4">
-                        <div className="flex justify-between items-center mb-1">
+                    <div className="p-6 md:p-4 flex flex-col gap-3">
+                        <div className="flex justify-between items-center mb-0">
                             <div>
-                                <h2 className="text-xl font-black text-white italic tracking-tighter">FILTROS</h2>
-                                <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase">Ajuste a visualização</p>
+                                <h2 className="text-lg font-black text-white italic tracking-tighter">FILTROS</h2>
+                                <p className="text-[8px] text-slate-500 font-bold tracking-widest uppercase">Visualização</p>
                             </div>
                             <button onClick={() => setIsMenuOpen(false)} className="md:hidden text-slate-400 p-2"><X size={24} /></button>
                         </div>

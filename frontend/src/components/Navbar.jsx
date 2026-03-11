@@ -53,23 +53,23 @@ const Navbar = ({ user, logout }) => {
 const NavLink = ({ to, icon, label, active, color = 'text-slate-400' }) => (
     <Link
         to={to}
-        className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ease-in-out relative group 
+        className={`flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-2 px-3 md:px-4 py-2 md:py-2 rounded-2xl md:rounded-full transition-all duration-500 ease-in-out relative group 
             ${active ? 'bg-indigo-600 text-white shadow-lg' : `${color} hover:text-white hover:bg-white/10`}`}
     >
         <span className="shrink-0">{icon}</span>
 
-        {/* Texto do Label: Expandido se ativo ou no hover */}
+        {/* Texto do Label: Em baixo no mobile, lado no desktop */}
         <span className={`
-            overflow-hidden transition-all duration-500 ease-in-out
-            ${active ? 'max-w-xs ml-1' : 'max-w-0 group-hover:max-w-xs group-hover:ml-1'}
+            overflow-hidden transition-all duration-500 ease-in-out text-center
+            ${active ? 'max-h-8 md:max-w-xs md:ml-1' : 'max-h-0 md:max-w-0 md:group-hover:max-w-xs md:group-hover:ml-1'}
         `}>
-            <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
+            <span className="text-[7px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap block">
                 {label}
             </span>
         </span>
 
         {active && !to.includes('register') && (
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full border-2 border-indigo-600"></span>
+            <span className="absolute top-1 right-1 md:-top-1 md:-right-1 w-1.5 h-1.5 bg-white rounded-full border border-indigo-600"></span>
         )}
     </Link>
 );
