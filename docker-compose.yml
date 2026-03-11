@@ -19,11 +19,7 @@ services:
       dockerfile: Dockerfile
     # container_name: projeto-igreja-backend
     restart: unless-stopped
-    # ports:
-    #   - "8000:80"
     working_dir: /var/www/html
-    # volumes:
-    #   - ./backend:/var/www/html
     environment:
       - DB_CONNECTION=mysql
       - DB_HOST=db
@@ -33,9 +29,6 @@ services:
       - DB_PASSWORD=root
     depends_on:
       - db
-    # Comando útil para garantir instalar o vendor e gerar a key, caso não existam
-    # comando removido para usar o padrão do Dockerfile em produção
-    # command: bash -c "composer install && php artisan key:generate --no-interaction && php artisan migrate --force && apache2-foreground"
 
   frontend:
     build:

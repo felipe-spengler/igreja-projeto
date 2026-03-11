@@ -1,11 +1,25 @@
 import axios from 'axios';
 
-// Define a URL base dinamicamente para evitar erros de 'localhost' em produção.
-// Se estiver rodando localmente (localhost), usa a porta 8000.
-// Se estiver no domínio do Coolify (igreja.techinteligente.site), troca 'igreja' por 'api-igreja'.
-const API_BASE_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:8000/api'
-    : `https://${window.location.hostname.replace('igreja', 'api-igreja')}/api`;
+const getBaseURL = () => {
+    const host = window.location.hostname;
+
+    // Se estiver no desenvolvimento local
+    if (host === 'localhost' || host === '127.0.0.1') {
+        return 'http://localhost:8000/api';
+    }
+
+    // Se estiver no Coolify, tentamos o subdomínio 'api-igreja'
+    // IMPORTANTE: O usuário precisa criar esse CNAME ou Registro A no DNS dele.
+    if (host.includes('techinteligente.site')) {
+        return `https://api-igreja.techinteligente.site/api`;
+    }
+
+    // Fallback: tenta o mesmo domínio (útil se o usuário configurar proxy /api no Coolify)
+    return `${window.location.origin}/api`;
+};
+
+const API_BASE_URL = getBaseURL();
+console.log("🚀 API URL Tentada:", API_BASE_URL);
 
 const api = axios.create({ baseURL: API_BASE_URL });
 

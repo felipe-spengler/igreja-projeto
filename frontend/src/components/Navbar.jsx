@@ -1,110 +1,68 @@
 import React, { useState } from 'react';
-import { LogIn, Building, FilePlus, HeartPulse, Map as MapIcon, LayoutDashboard, Calendar as CalendarIcon, Menu, X } from 'lucide-react';
+import { LogIn, Building, FilePlus, HeartPulse, Map as MapIcon, LayoutDashboard, Calendar as CalendarIcon, Menu, X, Shield, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = ({ user, logout }) => {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
 
-    const toggleMenu = () => setIsOpen(!isOpen);
-    const closeMenu = () => setIsOpen(false);
-
+    // Doca Flutuante: Minimalista, moderna e com efeito de vidro (glassmorphism)
     return (
-        <>
-            {/* MOBILE TOP BAR */}
-            <div className="lg:hidden bg-slate-900 text-white w-full p-4 flex justify-between items-center shadow-lg z-50 fixed top-0 left-0">
-                <Link to="/" className="flex items-center gap-2" onClick={closeMenu}>
-                    <HeartPulse size={20} className="text-indigo-500" />
-                    <span className="font-bold text-sm tracking-tight">Impacto Toledo</span>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[2000] w-auto animate-fade-in">
+            <div className="bg-slate-900/90 backdrop-blur-xl px-4 py-3 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 flex items-center gap-2">
+
+                {/* BRAND / HOME */}
+                <Link to="/" className={`p-3 rounded-full transition-all ${location.pathname === '/' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'}`}>
+                    <MapIcon size={24} />
                 </Link>
-                <button onClick={toggleMenu} className="p-2 bg-slate-800 rounded-lg">
-                    {isOpen ? <X size={20} /> : <Menu size={20} />}
-                </button>
-            </div>
 
-            {/* OVERLAY FOR MOBILE */}
-            {isOpen && (
-                <div
-                    className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[51] transition-opacity"
-                    onClick={closeMenu}
-                ></div>
-            )}
+                <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
 
-            {/* SIDEBAR SIDEBAR */}
-            <nav className={`
-                fixed inset-y-0 left-0 z-[52] w-72 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:flex lg:flex-col lg:w-64 lg:min-h-screen py-8 shadow-2xl shrink-0
-                ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}>
-                <div className="flex items-center gap-3 mb-10 px-6">
-                    <div className="bg-indigo-500 p-2 rounded-xl">
-                        <HeartPulse size={28} className="text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold tracking-tight leading-none">Impacto Toledo</h1>
-                        <p className="text-indigo-300 text-[10px] font-medium uppercase tracking-wider mt-1">Rede de Solidariedade</p>
-                    </div>
-                </div>
+                {/* MAIN NAV */}
+                <NavLink to="/stats" icon={<LayoutDashboard size={22} />} active={location.pathname === '/stats'} />
+                <NavLink to="/calendar" icon={<CalendarIcon size={22} />} active={location.pathname === '/calendar'} />
 
-                <div className="flex flex-col w-full px-4 gap-2 overflow-y-auto">
-                    <NavLink to="/" icon={<MapIcon size={20} />} label="Mapa de Impacto" active={location.pathname === '/'} onClick={closeMenu} />
-                    <NavLink to="/stats" icon={<LayoutDashboard size={20} />} label="Estatísticas" active={location.pathname === '/stats'} onClick={closeMenu} />
-                    <NavLink to="/calendar" icon={<CalendarIcon size={20} />} label="Calendário" active={location.pathname === '/calendar'} onClick={closeMenu} />
+                <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
 
-                    <div className="my-6 border-t border-slate-800 pt-6">
-                        <p className="text-[10px] text-slate-500 font-bold uppercase px-4 mb-3 tracking-widest">Colabore</p>
-                        <NavLink to="/register-action" icon={<FilePlus size={18} />} label="Propor Ação" active={location.pathname === '/register-action'} onClick={closeMenu} />
-                        <NavLink to="/register-church" icon={<Building size={18} />} label="Cadastrar Igreja" active={location.pathname === '/register-church'} onClick={closeMenu} />
-                    </div>
+                {/* COLLABORATE */}
+                <NavLink to="/register-action" icon={<PlusIcon size={22} />} active={location.pathname === '/register-action'} color="text-emerald-400" />
+                <NavLink to="/register-church" icon={<Building size={22} />} active={location.pathname === '/register-church'} color="text-amber-400" />
 
-                    {user ? (
-                        <div className="mt-8 border-t border-slate-800 pt-6">
-                            <p className="text-[10px] text-slate-500 font-bold uppercase px-4 mb-3 tracking-widest">Painel Admin</p>
-                            <NavLink to="/admin" icon={<LayoutDashboard size={18} />} label="Painel Principal" active={location.pathname.startsWith('/admin')} onClick={closeMenu} />
-                            <button
-                                onClick={() => { logout(); closeMenu(); }}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-red-400 hover:bg-red-500/10 w-full"
-                            >
-                                <LogIn size={20} className="rotate-180" />
-                                <span className="font-semibold text-sm">Sair da Conta</span>
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="mt-8 pt-6">
-                            <NavLink to="/login" icon={<LogIn size={20} />} label="Login Administrativo" active={location.pathname === '/login'} onClick={closeMenu} />
-                        </div>
-                    )}
-                </div>
-
-                {user && (
-                    <div className="mt-auto pt-8 px-4 w-full">
-                        <div className="bg-indigo-600/10 rounded-2xl p-4 border border-indigo-500/10">
-                            <p className="text-[10px] text-indigo-400 mb-2 uppercase font-bold tracking-tighter">Identidade</p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-600/30 uppercase">
-                                    {user.name?.[0] || 'U'}
-                                </div>
-                                <div className="truncate">
-                                    <p className="text-xs font-black text-white truncate">{user.name}</p>
-                                    <p className="text-[9px] text-indigo-400 uppercase font-black tracking-widest">{user.role}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {/* ADMIN / USER */}
+                {user ? (
+                    <>
+                        <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
+                        <NavLink to="/admin" icon={<Shield size={22} />} active={location.pathname.startsWith('/admin')} color="text-indigo-400" />
+                        <button
+                            onClick={logout}
+                            className="p-3 text-red-400 hover:bg-red-500/10 rounded-full transition-all"
+                        >
+                            <LogOut size={22} />
+                        </button>
+                    </>
+                ) : (
+                    <NavLink to="/login" icon={<LogIn size={22} />} active={location.pathname === '/login'} />
                 )}
-            </nav>
-        </>
+            </div>
+        </div>
     );
 };
 
-const NavLink = ({ to, icon, label, active, onClick }) => (
+const NavLink = ({ to, icon, active, color = 'text-slate-400' }) => (
     <Link
         to={to}
-        onClick={onClick}
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${active ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
+        className={`p-3 rounded-full transition-all relative group ${active ? 'bg-white/20 text-white' : `${color} hover:text-white hover:bg-white/10`}`}
     >
         {icon}
-        <span className="font-bold text-sm tracking-tight">{label}</span>
+        {active && <span className="absolute -top-1 -right-1 w-2 h-2 bg-indigo-500 rounded-full border-2 border-slate-900"></span>}
     </Link>
+);
+
+const PlusIcon = ({ size }) => (
+    <div className="relative">
+        <FilePlus size={size} />
+        <span className="absolute -top-1 -right-1 bg-emerald-500 w-3 h-3 rounded-full border-2 border-slate-900 flex items-center justify-center text-[8px]">+</span>
+    </div>
 );
 
 export default Navbar;

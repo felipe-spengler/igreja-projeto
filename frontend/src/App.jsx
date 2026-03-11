@@ -16,16 +16,12 @@ import LogViewer from './pages/LogViewer';
 // COMPONENTS
 import Navbar from './components/Navbar';
 
-// API vinculada via ./api.js
-
-// --- AUTH LOGIC ---
 const useAuth = () => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const login = (userData) => {
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
-    // Log login success
-    axios.post(`${API_BASE_URL}/logs`, {
+    api.post('/logs', {
       action: 'LOGIN',
       description: `User ${userData.name} logged into the system.`,
       status: 'success'
@@ -34,7 +30,7 @@ const useAuth = () => {
   const logout = () => {
     const u = JSON.parse(localStorage.getItem('user'));
     localStorage.removeItem('user');
-    if (u) axios.post(`${API_BASE_URL}/logs`, { action: 'LOGOUT', description: `User ${u.name} logged out.`, status: 'success' });
+    if (u) api.post('/logs', { action: 'LOGOUT', description: `User ${u.name} logged out.`, status: 'success' });
     setUser(null);
   };
   return { user, login, logout, isSuperAdmin: user?.role === 'super_admin' };
@@ -52,13 +48,11 @@ function App() {
 
   useEffect(() => {
     fetchData();
-
-    // --- AXIOS INTERCEPTOR FOR GLOBAL LOGGING (FRONTEND LOGS) ---
-    const interceptorId = axios.interceptors.response.use(
+    const interceptorId = api.interceptors.response.use(
       response => response,
       error => {
         if (error.config && !error.config.url.includes('/logs')) {
-          axios.post(`${API_BASE_URL}/logs`, {
+          api.post('/logs', {
             action: 'API_ERROR',
             description: `Error on ${error.config.method.toUpperCase()} ${error.config.url}: ${error.message}`,
             status: 'failure'
@@ -67,7 +61,7 @@ function App() {
         return Promise.reject(error);
       }
     );
-    return () => axios.interceptors.response.eject(interceptorId);
+    return () => api.interceptors.response.eject(interceptorId);
   }, []);
 
   const fetchData = async () => {
@@ -79,9 +73,9 @@ function App() {
         return [[], [], []];
       });
 
-      setAcoes(Array.isArray(acoesRes.data) ? acoesRes.data : []);
-      setBairros(Array.isArray(bairrosRes.data) ? bairrosRes.data : []);
-      setIgrejas(Array.isArray(igrejasRes.data) ? igrejasRes.data : []);
+      setAcoes(Array.isArray(acoesRes?.data) ? acoesRes.data : []);
+      setBairros(Array.isArray(bairrosRes?.data) ? bairrosRes.data : []);
+      setIgrejas(Array.isArray(igrejasRes?.data) ? igrejasRes.data : []);
     } finally {
       setLoading(false);
     }
@@ -90,7 +84,6 @@ function App() {
   const filteredAcoes = acoes.filter(a => {
     const matchIgreja = filterIgreja === 'todas' || a.clube?.igreja_id === parseInt(filterIgreja) || a.igreja_id === parseInt(filterIgreja);
     const matchClube = filterClube === 'todos' || a.clube?.nome === filterClube;
-    // Public Map always shows approved, Admin sees all in another view
     return matchIgreja && matchClube && a.status_moderacao === 'aprovada';
   });
 
@@ -98,9 +91,8 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="flex flex-col lg:flex-row h-screen w-full bg-slate-50 font-sans overflow-hidden text-slate-800">
-        <Navbar user={auth.user} logout={auth.logout} />
-        <main className="flex-1 h-full relative overflow-hidden bg-white mt-[72px] lg:mt-0">
+      <div className="relative h-screen w-full bg-slate-50 font-sans overflow-hidden text-slate-800">
+        <main className="h-full w-full relative overflow-hidden bg-white">
           <Routes>
             <Route path="/" element={<PublicHome
               acoes={acoes} bairros={bairros} filteredAcoes={filteredAcoes}
@@ -118,6 +110,8 @@ function App() {
             <Route path="/admin/logs" element={<LogViewer />} />
           </Routes>
         </main>
+
+        <Navbar user={auth.user} logout={auth.logout} />
 
         <style dangerouslySetInnerHTML={{
           __html: `
