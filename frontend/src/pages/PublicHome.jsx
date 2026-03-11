@@ -187,7 +187,7 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                                 color: '#334155', weight: 1, opacity: 0.3
                             }}
                         >
-                            <Popup className="custom-popup !rounded-[2.5rem] !p-0 shadow-2xl">
+                            <Popup className="custom-popup !rounded-[2.5rem] !p-0 shadow-2xl" offset={[150, 0]}>
                                 <div className="bg-slate-900 text-white p-6 rounded-t-[2.5rem]">
                                     <h4 className="font-black text-xl tracking-tighter mb-1 uppercase">{b.nome}</h4>
                                     <div className="flex items-center gap-2">
