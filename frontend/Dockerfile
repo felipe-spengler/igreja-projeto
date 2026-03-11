@@ -2,6 +2,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Copiar arquivos de configuração primeiro para cache de camadas
+COPY package*.json ./
+
+# Instalar dependências
+RUN npm install
+
+# Copiar o restante dos arquivos
+COPY . .
+
 # Expor a porta padrão do Vite (5173)
 EXPOSE 5173
 
