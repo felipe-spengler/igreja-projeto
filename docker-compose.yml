@@ -3,13 +3,13 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
-    container_name: projeto-igreja-db
+    # container_name: projeto-igreja-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: projeto_igreja
       MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
 
@@ -17,10 +17,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: projeto-igreja-backend
+    # container_name: projeto-igreja-backend
     restart: unless-stopped
-    ports:
-      - "8000:80"
+    # ports:
+    #   - "8000:80"
     working_dir: /var/www/html
     volumes:
       - ./backend:/var/www/html
@@ -40,10 +40,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: projeto-igreja-frontend
+    # container_name: projeto-igreja-frontend
     restart: unless-stopped
-    ports:
-      - "5173:5173"
+    # ports:
+    #   - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules

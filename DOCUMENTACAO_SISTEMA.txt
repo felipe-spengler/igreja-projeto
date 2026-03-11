@@ -21,13 +21,20 @@ O sistema foi desenvolvido para permitir que a rede de igrejas de Toledo possa v
 
 4. PAINEL ADMINISTRATIVO (MULTI-TENANT)
    - Cada Igreja tem seu próprio login e pode gerenciar apenas seus dados (seus clubes, suas ações).
-   - SUPER ADMIN: Capacidade de visualizar todas as cidades/igrejas e de "entrar" em qualquer perfil para auxílio técnico ou supervisão.
+   - SUPER ADMIN: Capacidade de visualizar todas as igrejas e de "entrar" em qualquer perfil para auxílio técnico ou supervisão.
 
 5. GESTÃO E MODERAÇÃO (MODERATED REGISTRATION)
    - Cadastro Público de Ações: Qualquer cidadão ou colaborador pode sugerir a realização de uma ação ou registrar uma já feita.
    - Moderação por Igreja: Propostas recebidas ficam "pendentes" no painel da igreja relevante até que um administrador a valide e vincule oficialmente.
    - Novas Igrejas: Portal para que novas congregações solicitem entrada na rede, aguardando aprovação do Super Administrador.
    - Multi-Admin: Suporte para múltiplos usuários gerenciarem a mesma igreja.
+
+6. AUDITORIA E LOGS
+   - Registro de Atividade (Logs): Todo impacto, login ou alteração crítica é registrado com IP e data/hora. Retenção automática de 15 dias.
+   - Interface exclusiva para o Super Admin monitorar a saúde e segurança do sistema.
+
+7. DESIGN RESPONSIVO
+   - Interface otimizada para Tablets, Smartphones e Desktop com menu mobile dinâmico.
 
 --- TECNOLOGIA ---
 - Backend: Laravel v12 (Motor de regras e banco de dados).
@@ -37,3 +44,8 @@ O sistema foi desenvolvido para permitir que a rede de igrejas de Toledo possa v
 --- PERSISTÊNCIA E HOSPEDAGEM ---
 - O banco de dados MySQL é persistente via volumes Docker.
 - Pode ser facilmente escalado para mais cidades além de Toledo.
+
+--- ESTRUTURA DE DADOS ---
+- igrejas: [id, nome, endereco, lat, lng, status(pendente/ativo)]
+- acoes: [id, titulo, descricao, data_inicio, pessoas_atendidas, status(programada/realizada), status_moderacao(pendente/aprovada), bairro_id, clube_id, igreja_id]
+- activity_logs: [id, user_id, action, description, status, ip, user_agent, created_at]
