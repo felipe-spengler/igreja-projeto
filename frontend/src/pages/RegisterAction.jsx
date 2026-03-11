@@ -78,7 +78,7 @@ const RegisterAction = ({ bairros, igrejas }) => {
                             <div className="md:col-span-2 flex flex-col md:flex-row gap-6 mt-4">
                                 <div className="flex-1 bg-indigo-50/50 p-6 rounded-3xl border border-dashed border-indigo-200 text-center cursor-pointer hover:bg-indigo-50 transition-all">
                                     <Clock className="mx-auto mb-2 text-indigo-400" />
-                                    <p className="text-xs font-bold text-indigo-600">Sua proposta ficará em análise pelo admin da igreja.</p>
+                                    <p className="text-xs font-bold text-indigo-600">Sua proposta ficará em análise.</p>
                                 </div>
                                 <button className="flex-[2] bg-slate-900 text-white py-6 rounded-3xl font-black text-xl hover:bg-black shadow-xl transition-all">
                                     Solicitar Registro de Impacto

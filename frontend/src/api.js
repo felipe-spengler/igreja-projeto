@@ -8,10 +8,9 @@ const getBaseURL = () => {
         return 'http://localhost:8000/api';
     }
 
-    // Se estiver no Coolify, tentamos o subdomínio 'api-igreja'
-    // IMPORTANTE: O usuário precisa criar esse CNAME ou Registro A no DNS dele.
+    // Se estiver no Coolify, usamos o domínio gerado que você me passou
     if (host.includes('techinteligente.site')) {
-        return `https://api-igreja.techinteligente.site/api`;
+        return `http://gs8gkoc0ow8o8osw088kc8c4.145.223.30.211.sslip.io/api`;
     }
 
     // Fallback: tenta o mesmo domínio (útil se o usuário configurar proxy /api no Coolify)
