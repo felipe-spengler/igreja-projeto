@@ -8,17 +8,13 @@ const getBaseURL = () => {
         return 'http://localhost:8000/api';
     }
 
-    // Se estiver no Coolify, usamos o domínio gerado que você me passou
-    if (host.includes('techinteligente.site')) {
-        return `http://gs8gkoc0ow8o8osw088kc8c4.145.223.30.211.sslip.io/api`;
-    }
-
-    // Fallback: tenta o mesmo domínio (útil se o usuário configurar proxy /api no Coolify)
-    return `${window.location.origin}/api`;
+    // Em produção no Coolify, usamos o MESMO domínio do frontend.
+    // O sistema de proxy (Traefik) vai encaminhar o que começar com /api para o backend.
+    return '/api';
 };
 
 const API_BASE_URL = getBaseURL();
-console.log("🚀 API URL Tentada:", API_BASE_URL);
+console.log("🚀 API URL Ativa:", API_BASE_URL);
 
 const api = axios.create({ baseURL: API_BASE_URL });
 
