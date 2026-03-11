@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
 import { format, parseISO } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { SortDesc, Users, Activity, ChevronRight, TrendingUp, LayoutGrid, List as ListIcon, Info } from 'lucide-react';
 import StatBox from '../components/StatBox';
 
@@ -104,8 +105,8 @@ const StatsPage = ({ filteredAcoes }) => {
                                 <h3 className="text-[11px] font-black text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-2">
                                     <Activity size={16} className="text-indigo-500" /> Impacto {filterClube === 'todos' ? 'Geral' : 'do Clube'}
                                 </h3>
-                                <div className="grow w-full min-h-[300px]">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                <div className="grow w-full h-[300px]">
+                                    <ResponsiveContainer width="99%" height="100%">
                                         <BarChart data={barChartData}>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                             <XAxis dataKey="nome" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 8, fontWeight: 900 }} />
@@ -122,9 +123,9 @@ const StatsPage = ({ filteredAcoes }) => {
                                 <h3 className="text-[11px] font-black text-slate-900 mb-8 uppercase tracking-widest flex items-center gap-2 self-start w-full">
                                     <Info size={16} className="text-emerald-500" /> Distribuição de Status
                                 </h3>
-                                <div className="grow w-full min-h-[250px] flex justify-center items-center">
+                                <div className="grow w-full h-[250px] flex justify-center items-center">
                                     {fTotalAcoes > 0 ? (
-                                        <ResponsiveContainer width="100%" height="100%">
+                                        <ResponsiveContainer width="99%" height="100%">
                                             <PieChart>
                                                 <Pie data={pieData} innerRadius={60} outerRadius={80} paddingAngle={10} dataKey="value">
                                                     {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
