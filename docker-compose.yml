@@ -17,10 +17,14 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    # container_name: projeto-igreja-backend
     restart: unless-stopped
     working_dir: /var/www/html
     environment:
+      - APP_NAME=ImpactoSocial
+      - APP_ENV=production
+      - APP_KEY=base64:66D7D3C6E5A4B3C2D1E0F9A8B7C6D5E4F3A2B1C0D9E= # Chave de 32 bytes base64
+      - APP_DEBUG=true
+      - APP_URL=https://igreja.techinteligente.site
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_PORT=3306
@@ -32,6 +36,7 @@ services:
     labels:
       - traefik.enable=true
       - "traefik.http.routers.projeto-backend.rule=Host(`igreja.techinteligente.site`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.projeto-backend.priority=100"
       - traefik.http.routers.projeto-backend.entryPoints=https
       - traefik.http.routers.projeto-backend.tls=true
       - traefik.http.routers.projeto-backend.tls.certresolver=letsencrypt
@@ -41,7 +46,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    # container_name: projeto-igreja-frontend
     restart: unless-stopped
     # ports:
     #   - "5173:5173"
@@ -50,9 +54,11 @@ services:
     #   - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_API_URL=https://igreja.techinteligente.site/api
     labels:
       - traefik.enable=true
       - "traefik.http.routers.projeto-frontend.rule=Host(`igreja.techinteligente.site`)"
+      - "traefik.http.routers.projeto-frontend.priority=10"
       - traefik.http.routers.projeto-frontend.entryPoints=https
       - traefik.http.routers.projeto-frontend.tls=true
       - traefik.http.routers.projeto-frontend.tls.certresolver=letsencrypt
