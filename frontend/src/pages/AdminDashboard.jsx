@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api';
 import { Clock, Building, CheckCircle, XCircle, LayoutDashboard, Database, Shield } from 'lucide-react';
 import AdminActionCard from '../components/AdminActionCard';
 import { Link } from 'react-router-dom';
@@ -15,7 +16,7 @@ const AdminDashboard = ({ user }) => {
 
     const fetchAdminData = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/admin/resumo');
+            const res = await api.get('/admin/resumo');
             setData(res.data);
         } catch (error) {
             console.error(error);
@@ -28,7 +29,7 @@ const AdminDashboard = ({ user }) => {
         try {
             // Need to specify a club_id if it's currently null
             const payload = updatedData.clube_id ? updatedData : { ...updatedData, clube_id: 1 }; // Default for dummy
-            await axios.patch(`http://localhost:8000/api/acoes/${id}/vincular`, payload);
+            await api.patch(`/acoes/${id}/vincular`, payload);
             fetchAdminData();
         } catch (error) {
             console.error(error);
@@ -38,7 +39,7 @@ const AdminDashboard = ({ user }) => {
 
     const handleApproveChurch = async (id) => {
         try {
-            await axios.patch(`http://localhost:8000/api/igrejas/${id}/aprovar`);
+            await api.patch(`/igrejas/${id}/aprovar`);
             fetchAdminData();
         } catch (error) {
             console.error(error);

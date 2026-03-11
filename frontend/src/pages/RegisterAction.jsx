@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, CheckCircle, Clock } from 'lucide-react';
 import FormInput from '../components/FormInput';
 import axios from 'axios';
+import api from '../api';
 
 const RegisterAction = ({ bairros, igrejas }) => {
     const [sent, setSent] = useState(false);
@@ -13,7 +14,7 @@ const RegisterAction = ({ bairros, igrejas }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8000/api/propor-acao', formData);
+            await api.post('/propor-acao', formData);
             setSent(true);
         } catch (error) {
             console.error(error);
@@ -42,7 +43,7 @@ const RegisterAction = ({ bairros, igrejas }) => {
                                 />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Vincular à Igreja (Opcional)</label>
+                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Vincular ao Clube (Opcional)</label>
                                 <select
                                     value={formData.igreja_id} onChange={e => setFormData({ ...formData, igreja_id: e.target.value })}
                                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 font-bold text-slate-700 outline-none focus:border-indigo-500"

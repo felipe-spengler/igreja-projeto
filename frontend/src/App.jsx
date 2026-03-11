@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import api, { API_BASE_URL } from './api';
 
 // PAGES
 import PublicHome from './pages/PublicHome';
@@ -15,8 +16,7 @@ import LogViewer from './pages/LogViewer';
 // COMPONENTS
 import Navbar from './components/Navbar';
 
-const API_BASE_URL = 'http://localhost:8000/api';
-const api = axios.create({ baseURL: API_BASE_URL });
+// API vinculada via ./api.js
 
 // --- AUTH LOGIC ---
 const useAuth = () => {

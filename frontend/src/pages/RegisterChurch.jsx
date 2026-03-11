@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Building, Clock, CheckCircle } from 'lucide-react';
 import FormInput from '../components/FormInput';
 import axios from 'axios';
+import api from '../api';
 
 const RegisterChurch = () => {
     const [sent, setSent] = useState(false);
@@ -11,7 +12,7 @@ const RegisterChurch = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8000/api/propor-igreja', formData);
+            await api.post('/propor-igreja', formData);
             setSent(true);
         } catch (error) {
             console.error(error);

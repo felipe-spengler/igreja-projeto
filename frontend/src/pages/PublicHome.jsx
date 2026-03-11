@@ -35,13 +35,13 @@ const PublicHome = ({ acoes, bairros, filteredAcoes, filterIgreja, setFilterIgre
                     </div>
                     <div className="w-full md:w-[1px] h-[1px] md:h-8 bg-slate-200"></div>
                     <div className="flex flex-col px-2 w-full md:grow min-w-[150px]">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-widest pl-1">Filtrar por Ministério</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-widest pl-1">Filtrar por Clube</span>
                         <select
                             value={filterClube}
                             onChange={(e) => setFilterClube(e.target.value)}
                             className="bg-slate-100/50 border-none text-sm font-bold text-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none pr-8 py-2"
                         >
-                            <option value="todos">Todos os Ministérios</option>
+                            <option value="todos">Todos os Clubes</option>
                             {Array.from(new Set(acoes.map(a => a.clube?.nome))).filter(Boolean).map(name => (
                                 <option key={name} value={name}>{name}</option>
                             ))}

@@ -35,7 +35,7 @@ const StatsPage = ({ filteredAcoes }) => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-100 h-[500px] flex flex-col">
-                    <h3 className="text-xl font-bold mb-8 text-slate-800">Impacto por Ministério</h3>
+                    <h3 className="text-xl font-bold mb-8 text-slate-800">Impacto por Clube</h3>
                     <div className="grow w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={chartData}>
